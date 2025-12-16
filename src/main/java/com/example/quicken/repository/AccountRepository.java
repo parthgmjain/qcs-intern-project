@@ -22,7 +22,6 @@ public class AccountRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // --- Fetch all accounts ---
     public List<Account> findAllAccounts() {
         String sql = "SELECT id, name, description FROM accounts";
         return jdbcTemplate.query(sql, new RowMapper<Account>() {
@@ -37,7 +36,6 @@ public class AccountRepository {
         });
     }
 
-    // --- Get summary for an account in a date range ---
     public AccountSummary getAccountSummary(Long accountId, LocalDate from, LocalDate to) {
         String sql = "SELECT " +
                      "COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END),0) AS total_income, " +

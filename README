@@ -1,0 +1,145 @@
+# Quicken Project
+
+## Overview
+
+Quicken is a simple Spring Boot application for managing financial accounts and transactions.
+It allows users to view accounts and compute summaries of income, expenses, and net totals over a specified date range.
+
+The project uses **Spring Boot 3.4**, **Spring Data JDBC**, and an **H2 in-memory database**.
+It demonstrates explicit SQL queries, clean Java modeling, and a layered architecture.
+
+## Features
+
+* List all accounts
+* Get a summary of transactions for a specific account within a date range
+
+  * Total income
+  * Total expenses
+  * Net (income + expenses)
+* Extensible for daily/monthly summaries or other reports
+
+
+## Prerequisites
+
+* Java 21
+* Gradle
+* IDE (IntelliJ, VSCode, Eclipse, etc.)
+
+## Setup Instructions
+
+1. Clone the repository:
+
+```bash
+git clone <repo-url>
+cd quicken
+```
+
+2. Set `JAVA_HOME` to Java 21 (Mac example):
+
+```bash
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+3. Build the project:
+
+```bash
+./gradlew clean build
+```
+
+4. Run the application:
+
+```bash
+./gradlew bootRun
+```
+
+5. Access the H2 console at [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+
+   * JDBC URL: `jdbc:h2:mem:quicken`
+   * Username: `sa`
+   * Password: *(leave empty)*
+
+
+## API Endpoints
+
+### Get all accounts
+
+```
+GET /api/accounts
+```
+
+**Response Example:**
+
+```json
+[
+  {"id":1,"name":"Personal Finances 2024","description":"Personal income and household expenses"},
+  {"id":2,"name":"Small Business 2024","description":"Simple small business cashflow"},
+  {"id":3,"name":"Student Budget 2024","description":"Student income, loans, and living expenses"}
+]
+```
+
+### Get account summary
+
+```
+GET /api/accounts/{id}/summary?from=YYYY-MM-DD&to=YYYY-MM-DD
+```
+
+**Example:**
+
+```
+GET /api/accounts/1/summary?from=2024-01-01&to=2024-01-31
+```
+
+**Response Example:**
+
+```json
+{
+  "totalIncome": 3900.00,
+  "totalExpenses": -2101.75,
+  "net": 1798.25
+}
+```
+
+## Design Decisions
+
+* **Spring Data JDBC**: Chosen over JPA to practice explicit SQL and JDBC mapping
+* **Domain models**: `Account`, `Transaction`, `AccountSummary` are plain Java objects
+* **Service layer**: Encapsulates business logic to keep controllers thin
+* **SQL initialization**: Uses H2 in-memory database for simplicity and portability
+
+
+## Testing
+
+* Focused on `AccountService` logic
+* Validates correct computation of income, expenses, and net totals
+* Handles empty or boundary date ranges
+
+Run tests:
+
+```bash
+./gradlew test
+```
+
+
+
+## Example Usage with curl
+
+Get all accounts:
+
+```bash
+curl http://localhost:8080/api/accounts
+```
+
+Get summary for account 1 in January 2024:
+
+```bash
+curl "http://localhost:8080/api/accounts/1/summary?from=2024-01-01&to=2024-01-31"
+```
+
+
+
+## Future Improvements
+
+* Daily or monthly summaries
+* Largest expense report
+* User authentication and multi-user support
